@@ -9,8 +9,8 @@ This project is developed based [Lexecutor](https://github.com/michaelpradel/LEx
 `python -m SelfDyCo.Instrument --files test.py --iids iids.json`
 
 ### Step 2: Set the mode
-change the base LLM in `Runtime.py`
-using your own Openai API key in `SelfPiCo/pedictor/GPT/ValuePrediector.py` and `SelfPiCo/pedictor/GPT/TypePrediector.py`
+1. change the base LLM in `Runtime.py`
+2. Using your own Openai API key in `SelfPiCo/pedictor/GPT/ValuePrediector.py` and `SelfPiCo/pedictor/GPT/TypePrediector.py`
 
 ### Step 3: Guide partial code execution
 Direct execute the instrumented partial code
