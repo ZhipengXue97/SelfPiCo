@@ -1,0 +1,6 @@
+# Extracted from https://stackoverflow.com/questions/23086383/how-to-test-nonetype-in-python
+if (new): # not None
+  ...
+else: # NoneType
+  ...
+

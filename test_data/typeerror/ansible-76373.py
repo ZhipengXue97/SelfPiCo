@@ -1,0 +1,1 @@
+config['changes'] = {sorted(entries) if section != self.config.prelude_name else entries}

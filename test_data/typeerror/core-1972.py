@@ -1,0 +1,1 @@
+check = condition.from_config(action)(self.hass, False)
