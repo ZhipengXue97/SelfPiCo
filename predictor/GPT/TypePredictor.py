@@ -6,7 +6,7 @@ from ...Hyperparams import Hyperparams as params
 from ...ValueAbstraction import restore_value
 import requests
 import json
-import openai
+from openai import OpenAI
 from .Prompt import GetPrompt
 
 
@@ -14,23 +14,23 @@ from .Prompt import GetPrompt
 class GptTypePredictor(Predictor):
     def __init__(self, stats):
         self.stats = stats
-        self.api_key = ''
         self.iids = IIDs(params.iids_file)
         self.globle_module = []
         self.input_factory = TypeInputFactory(self.iids)
         self.entry = {}
+        self.api_key = ''
+        self.client = OpenAI(api_key=self.api_key)
 
 
-    def type_query_model(self, entry):
+    def _query_model(self, entry):
         def get(entry):
             conversation = GetPrompt(entry)
-            openai.api_key = self.api_key
-            response = openai.ChatCompletion.create(model="gpt-3.5-turbo-0301", messages = conversation, temperature=0, max_tokens=5,  top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
-            return response['choices'][0]['message']['content']
+            response = self.client.chat.completions.create(model="gpt-3.5-turbo", messages = conversation, temperature=0, max_tokens=5,  top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
+            return response.choices[0].message.content
 
         self.entry = self.input_factory.entry_to_inputs(self.entry)
         response = get(entry)
-        val_as_string = json.loads(response.text)["content"].strip()
+        val_as_string = response.strip()
         logger.info(val_as_string)
         val = restore_value(val_as_string)
         return val_as_string, val

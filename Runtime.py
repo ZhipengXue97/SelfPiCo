@@ -9,6 +9,8 @@ from .RuntimeStats import RuntimeStats
 from .Logging import logger
 from .predictor.CodeLLama.ValuePredictor import CodeLLamaValuePredictor
 from .predictor.CodeLLama.TypePredictor import CodeLLamaTypePredictor
+# from .predictor.GPT.ValuePredictor import GptValuePredictor
+# from .predictor.GPT.TypePredictor import GptTypePredictor
 from .Util import exec_predict, store_memory, load_memory, remove_comments
 
 
@@ -38,6 +40,8 @@ elif mode == "PREDICT":
     atexit.register(runtime_stats.print)
     valuepredictor = CodeLLamaValuePredictor(runtime_stats)
     typepredictor = CodeLLamaTypePredictor(runtime_stats)
+    # valuepredictor = GptValuePredictor(runtime_stats)
+    # typepredictor = GptTypePredictor(runtime_stats)
     start_time = time.time()
     valuepredictor_name = valuepredictor.__class__.__name__
 

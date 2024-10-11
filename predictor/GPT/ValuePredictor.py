@@ -8,27 +8,30 @@ from ...ValueAbstraction import restore_value
 import requests
 import json
 import re
-import openai
+from openai import OpenAI
 from .Prompt import GetPrompt, get_clean_conversation
 
 
 
 
-class GptTypePredictor(Predictor):
+class GptValuePredictor(Predictor):
     def __init__(self, stats):
         self.stats = stats
-        self.api_key = ''
+        self.env = {}
         self.iids = IIDs(params.iids_file)
         self.globle_module = []
         self.input_factory = ValueInputFactory(self.iids)
+        self.api_key = ''
+        self.client = OpenAI(api_key=self.api_key)
 
 
-    def type_query_model(self, entry):
+
+
+    def _query_model(self):
         def get(entry):
             conversation = GetPrompt(entry)
-            openai.api_key = self.api_key
-            response = openai.ChatCompletion.create(model="gpt-3.5-turbo-0301", messages = conversation, temperature=0, max_tokens=5,  top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
-            return response['choices'][0]['message']['content']
+            response = self.client.chat.completions.create(model="gpt-3.5-turbo", messages = conversation, temperature=0, max_tokens=512,  top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
+            return response.choices[0].message.content
 
         def check_response(response):
             response = response.split("\n")
@@ -41,9 +44,8 @@ class GptTypePredictor(Predictor):
         def LLM_clean(code):
             code = remove_comments(code)
             conversation = get_clean_conversation(self.entry, code)
-            openai.api_key = self.api_key
-            response = openai.ChatCompletion.create(model="gpt-3.5-turbo-0301", messages = conversation, temperature=0, max_tokens=5,  top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
-            response = json.loads(response.text)["content"]
+            response = self.client.chat.completions.create(model="gpt-3.5-turbo", messages = conversation, temperature=0, max_tokens=512,  top_p=1.0, frequency_penalty=0.0, presence_penalty=0.0)
+            response = response.choices[0].message.content
             pattern = r"```([\s\S]*?)```"
             response = re.search(pattern, response).group(1)
             response = remove_comments(response)
@@ -102,7 +104,7 @@ class GptTypePredictor(Predictor):
                         return getattr(v, self.entry['attr']), response
                     except:
                         try:
-                            response = LLM_clean(response)
+                            # response = LLM_clean(response)
                             response = '\n'.join(self.globle_module) + response
                             v, _ = exec_predict(self.entry['name'], response)
                             return getattr(v, self.entry['attr']), response
